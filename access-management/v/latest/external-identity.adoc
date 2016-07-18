@@ -1,10 +1,13 @@
 = External Identity
 :keywords: anypoint platform, permissions, configuring, pingfederate, saml
 
-There are two ways of setting up external identities:
+Setting up _external identity_ means that you configure an identity provider (IdP) to authenticate an acting agent (either an user, a client, or both) and then assert to Anypoint Platform that said agent has been validated by it and should be trusted.
 
-* External identities for user management
-* External identities for client management
+This means that you can set up:
+
+* External identities for user management using SAML 2.0
+* External identities for client management using OAuth 2.0
+* External identities for both user and client management
 
 [NOTE]
 ====
@@ -13,29 +16,12 @@ In order to set external identities, you need to own the proper entitlements. If
 
 == User Management
 
-/////
-Also called SSO
-/////
-
 The Anypoint Platform can be integrated with your organization's external federated identity system. +
-Opting to use federated identity management for the Anypoint Platform gives your users single sign-on access.
+Opting to use federated identity management for the Anypoint Platform gives your users single sign-on access (SSO).
 
-////
-Explain what User management is
-////
+If all you need is the ability to implement *user management*, you need to select a working <<Saml 2.0,SAML 2.0 compliant Identity provider>> (if you don´t have one) and follow the <<Instructions for SAML Configuration,SAML configuration instructions>>.
 
-
-If all you need is the ability to implement *user management*, you just need to follow the <<Instructions for SAML Configuration,SAML 2.0 instructions>>.
-
-
-=== Mulesoft Default
-
-////
-log in to anypoint platform
-////
-
-
-=== Saml 2.0
+=== Saml 2.0 Identity Providers
 
 The Anypoint Platform supports SAML 2.0 compliant identity management providers for user management and SSO, the following IdPs have been successfully tested as working with Anypoint Platform:
 
@@ -50,9 +36,11 @@ The Anypoint Platform supports SAML 2.0 compliant identity management providers 
 For these providers, the 'Assertion Consumer Service' or 'SAML Assertion URL' is `https://anypoint.mulesoft.com/accounts/login/receive-id` and the 'entityID' or 'Audience URL' is any string value that identifies your organization. By convention it is <organizationDomain>.anypoint.mulesoft.com, but any value is acceptable.
 
 
+If you choose to configure either OpenAM or Ping Federate and you wish to implement both *User Management* as well as *Client Management* (to facilitate OAuth security for APIs) then, based on the IdP you want to configure, follow the  <<openam-client,openAM for client management instructions>>  or the <<pingfederate-client,PingFederate for client management instructions>> respectively.
+
 [NOTE]
 --
-If you choose to configure either OpenAM or Ping Federate and you wish to implement both *User Management* as well as *Client Management* (to facilitate OAuth security for APIs) then, based on the IdP you want to configure, follow the  <<openam-client,openAM for client management instructions>>  or the <<pingfederate-client,PingFederate for client management instructions>> respectively.
+The list of IdPs described above shows providers that have been succesfully tested with Anypoint Platform. However, any provider compliant with SAML 2.0 should work following the <<Instructions for SAML Configuration, instructions below>>.
 --
 
 ==== Instructions for SAML Configuration
@@ -88,7 +76,7 @@ You must provide the following information in the form:
 |Sign Out URL |URL to redirect sign out requests, so users both sign out of the Anypoint Platform and have their SAML user's status set to signed out.
 |===
 
-==== Federated Organizations - Map Users to Anypoint Platform Roles
+=== Federated Organizations - Map Users to Anypoint Platform Roles
 
 As of November 2014, Anypoint Platform provides a feature to help you map users in a federated organization's LDAP group to an Anypoint link:/access-management/roles.adoc[Role].
 
@@ -165,9 +153,6 @@ image:APJUSetExGrpMap.png[APJUSetExGrpMap.png]
 ////
 Explain Client MGMT
 ////
-
-=== Mulesoft Default
-
 
 === OAuth 2.0
 
