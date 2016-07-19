@@ -1,7 +1,9 @@
 // TODO
 // * add mode to run jetty in background
-// * combine css (need to update template as well)
 // * set outputs.dir for custom tasks
+import com.eriwen.gradle.css.tasks.CombineCssTask
+import com.eriwen.gradle.css.tasks.MinifyCssTask
+
 buildscript {
   configurations.create('builder')
   configurations.create('singlePageBuilder')
@@ -137,7 +139,7 @@ task copyAssets(type: Copy) {
   from(assetsDir) {
     exclude 'README.md'
     exclude '_*/**'
-    //exclude 'css/*.less'
+    exclude 'css'
   }
   into siteDir
   //outputs.dir siteDir
@@ -152,10 +154,15 @@ task copyAssets(type: Copy) {
 
 css {
   source {
-    main {
+    standard {
       css {
         srcDir "$assetsDir/css"
         include '*.css'
+      }
+    }
+    less {
+      css {
+        srcDir "$assetsDir/css"
         include '*.less'
       }
     }
@@ -165,20 +172,36 @@ css {
 lesscss {
   dependsOn setup
   mustRunAfter copyAssets
-  source = css.source.main.css.asFileTree
-  dest = file("$siteDir/css/")
+  source = css.source.less.css.asFileTree
+  dest = "${buildDir}/generated-css/mulesoft"
 }
 
-//def cssDir = "app/styles/"
-//def cssSrc = ["file1.css","file2.css"]
-//
-//combineCss {
-//    source = cssSrc.collect {cssDir+it}
-//    dest = "$buildDir/all.css"
-//}
+task combineMulesoftCss(type: CombineCssTask, group: 'Build') {
+  source = lesscss
+  dest = "${buildDir}/css/mulesoft.css"
+}
+
+task combineVendorCss(type: CombineCssTask, group: 'Build') {
+  source = css.source.standard.css.asFileTree
+  dest = "${buildDir}/css/vendor.css"
+}
+
+task minifyMulesoftCss(type: MinifyCssTask, group: 'Build') {
+  source = combineMulesoftCss
+  dest = "${siteDir}/css/mulesoft.min.css"
+}
+
+task minifyVendorCss(type: MinifyCssTask, group: 'Build') {
+  source = combineVendorCss
+  dest = "${siteDir}/css/vendor.min.css"
+}
+
+task minifyAllCss(group: 'Build') {
+  dependsOn minifyMulesoftCss, minifyVendorCss
+}
 
 task build(group: 'Build', description: 'Builds site.') {
-  dependsOn setup, buildHtml, copyAssets //, lesscss
+  dependsOn setup, buildHtml, copyAssets, minifyAllCss
   mustRunAfter clean
 }
 
